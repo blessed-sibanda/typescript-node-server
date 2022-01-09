@@ -1,21 +1,13 @@
-const databaseName = 'my-app';
-const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const config = {
-  mongoUri:
-    process.env.MONGODB_URI ||
-    process.env.MONGO_HOST ||
-    'mongodb://' +
-      (process.env.IP || 'localhost') +
-      ':' +
-      (process.env.MONGO_PORT || '27017') +
-      '/' +
-      databaseName,
-  jwtSecret: process.env.JWT_SECRET || 'my-secret',
+  mongoUri: process.env.MONGO_URI as string,
+  jwtSecret: process.env.JWT_SECRET || 'my-super-secret',
   fileBucket: 'files',
-  databaseName,
-  baseUrl,
-  filesUrl: baseUrl + '/api/upload/files/',
+  filesUrl: process.env.BASE_URL + '/api/upload/files/',
+  isProduction: process.env.NODE_ENV === 'production',
+  port: process.env.PORT || 3000,
 };
 
 export default config;
