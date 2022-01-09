@@ -1,7 +1,7 @@
-import express, { Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { Todo } from '../models/todo';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/api/todo', async (req: Request, res: Response) => {
   const todo = await Todo.find({});

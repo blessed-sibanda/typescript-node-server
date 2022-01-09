@@ -1,17 +1,74 @@
-import express from 'express';
-import logger from 'morgan';
-import mongoose from 'mongoose';
-import { todoRouter } from './routes/todo';
+import http from 'http';
+import app from './app';
+import d from 'debug';
 
-const app = express();
-app.use(express.json());
-app.use(logger('dev'));
-app.use(todoRouter);
+import { connectDb } from './helpers/db';
+import config from './config';
 
-mongoose.connect('mongodb://localhost:27017/todo', () => {
-  console.log('connected to database');
-});
+const debug = d('my-app:server');
 
-app.listen(3000, () => {
-  console.log('server is listening on port 3000');
-});
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val: any) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error: { syscall: string; code: any }) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr?.port;
+  debug('Listening on ' + bind);
+}
+
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+connectDb(config.mongoUri);
+const server = http.createServer(app);
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
